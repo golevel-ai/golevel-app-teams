@@ -2,32 +2,32 @@
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
   "manifestVersion": "1.17",
   "version": "1.0.0",
-  "id": "a5b7c9d1-e3f5-4a6b-8c0d-2e4f6a8b0c1d",
+  "id": "b6c8d2e4-f4a6-5b7c-9d1e-3f5a7b9c0d2e",
   "developer": {
-    "name": "Hablas",
-    "websiteUrl": "https://hablas.chat",
-    "privacyUrl": "https://hablas.chat/privacidade",
-    "termsOfUseUrl": "https://hablas.chat/termos"
+    "name": "GoLevel",
+    "websiteUrl": "https://golevel.com.br",
+    "privacyUrl": "https://golevel.com.br/privacidade",
+    "termsOfUseUrl": "https://golevel.com.br/termos"
   },
   "name": {
-    "short": "Hablas",
-    "full": "Hablas — Plataforma de Conversas Inteligentes"
+    "short": "GoLevel",
+    "full": "GoLevel — Plataforma de Gestão e Automação"
   },
   "description": {
-    "short": "Acesse o Hablas diretamente no Microsoft Teams.",
-    "full": "O Hablas é uma plataforma de conversas inteligentes que permite gerenciar atendimentos, conversas e comunicação de forma centralizada. Com este aplicativo, você acessa todas as funcionalidades do Hablas diretamente dentro do Microsoft Teams, sem precisar alternar entre aplicativos."
+    "short": "Acesse o GoLevel diretamente no Microsoft Teams.",
+    "full": "O GoLevel é uma plataforma completa de gestão e automação que permite gerenciar CRM, marketing, vendas e atendimento de forma centralizada. Com este aplicativo, você acessa todas as funcionalidades do GoLevel diretamente dentro do Microsoft Teams, com login SSO nativo da Microsoft."
   },
   "icons": {
     "color": "color.png",
     "outline": "outline.png"
   },
-  "accentColor": "#0062B8",
+  "accentColor": "#1B2A4A",
   "staticTabs": [
     {
-      "entityId": "hablas-tab",
-      "name": "Hablas",
-      "contentUrl": "https://app.hablas.chat",
-      "websiteUrl": "https://app.hablas.chat",
+      "entityId": "golevel-tab",
+      "name": "GoLevel",
+      "contentUrl": "https://admin.golevel.com.br",
+      "websiteUrl": "https://admin.golevel.com.br",
       "scopes": [
         "personal"
       ]
@@ -38,7 +38,11 @@
     "messageTeamMembers"
   ],
   "validDomains": [
-    "app.hablas.chat",
-    "hablas.chat"
-  ]
+    "admin.golevel.com.br",
+    "golevel.com.br"
+  ],
+  "webApplicationInfo": {
+    "id": "{{AZURE_APP_CLIENT_ID}}",
+    "resource": "api://admin.golevel.com.br/{{AZURE_APP_CLIENT_ID}}"
+  }
 }

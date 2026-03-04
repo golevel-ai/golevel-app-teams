@@ -2,7 +2,7 @@
 
 ## Contexto
 
-O Hablas foi integrado como aplicativo no Microsoft Teams (Personal Tab). O app carrega `app.hablas.chat` dentro de um iframe no cliente Teams.
+O GoLevel foi integrado como aplicativo no Microsoft Teams (Personal Tab). O app carrega `admin.golevel.com.br` dentro de um iframe no cliente Teams, com autenticação SSO nativa da Microsoft.
 
 **Problema**: ao trocar de aba no Teams e voltar, o usuário precisa logar novamente.
 
@@ -23,7 +23,7 @@ O Hablas foi integrado como aplicativo no Microsoft Teams (Personal Tab). O app 
 # add_header X-Frame-Options "SAMEORIGIN";
 
 # ADICIONAR:
-add_header Content-Security-Policy "frame-ancestors 'self' https://*.teams.microsoft.com https://teams.microsoft.com https://teams.live.com https://enterprise-261.hablas.chat";
+add_header Content-Security-Policy "frame-ancestors 'self' https://*.teams.microsoft.com https://teams.microsoft.com https://teams.live.com https://admin.golevel.com.br";
 ```
 
 **No Node.js/Express** (se o header estiver sendo definido no código):
@@ -54,7 +54,7 @@ app.use(cors({
   origin: [
     'https://teams.microsoft.com',
     'https://teams.live.com',
-    'https://app.hablas.chat'
+    'https://admin.golevel.com.br'
   ],
   credentials: true
 }));
