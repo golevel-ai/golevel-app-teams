@@ -39,10 +39,12 @@
   ],
   "validDomains": [
     "admin.golevel.com.br",
-    "golevel.com.br"
+    "golevel.com.br",
+    "hznoefdjdgtvrldajcdf.supabase.co",
+    "login.microsoftonline.com"
   ],
   "webApplicationInfo": {
-    "id": "029f8c3c-ccea-4ed7-94ac-2129d437fa62",
-    "resource": "api://admin.golevel.com.br/029f8c3c-ccea-4ed7-94ac-2129d437fa62"
+    "id": "c4cc93b9-e10c-43b3-9a94-f273d7c9a49c",
+    "resource": "api://admin.golevel.com.br/c4cc93b9-e10c-43b3-9a94-f273d7c9a49c"
   }
 }
