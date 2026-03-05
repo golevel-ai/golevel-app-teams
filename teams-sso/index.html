@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoLevel — Microsoft Teams</title>
+  <script src="https://res.cdn.office.net/teams-js/2.28.0/js/MicrosoftTeams.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', -apple-system, sans-serif;
+      background: #1B2A4A;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .status {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 2rem;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn {
+      display: none;
+      padding: 12px 32px;
+      background: #0078D4;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #106EBE; }
+    .error {
+      display: none;
+      color: #FF6B6B;
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="https://admin.golevel.com.br/teams/color.png" alt="GoLevel" class="logo" onerror="this.style.display='none'">
+    <h1>GoLevel</h1>
+    <p class="status" id="status">Conectando ao Microsoft Teams...</p>
+    <div class="spinner" id="spinner"></div>
+    <button class="btn" id="loginBtn" onclick="loginViaPopup()">Entrar com Microsoft</button>
+    <p class="error" id="error"></p>
+  </div>
+
+  <script>
+    // =====================================================
+    // CONFIGURAÇÃO — ALTERE ESTES VALORES
+    // =====================================================
+    const SUPABASE_URL = 'https://hznoefdjdgtvrldajcdf.supabase.co';
+    const SUPABASE_ANON_KEY = 'SUA_ANON_KEY_AQUI'; // Substituir pela anon key do Supabase
+    const GOLEVEL_URL = 'https://admin.golevel.com.br';
+    const AUTH_CALLBACK_URL = window.location.origin + '/teams/auth-callback.html';
+    // =====================================================
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let isInTeams = false;
+
+    function setStatus(text) {
+      document.getElementById('status').textContent = text;
+    }
+
+    function showError(text) {
+      document.getElementById('error').textContent = text;
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('spinner').style.display = 'none';
+    }
+
+    function showLoginButton() {
+      document.getElementById('loginBtn').style.display = 'inline-block';
+      document.getElementById('spinner').style.display = 'none';
+    }
+
+    // Verificar se já tem sessão ativa no Supabase
+    async function checkExistingSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setStatus('Sessão ativa. Redirecionando...');
+        window.location.href = GOLEVEL_URL;
+        return true;
+      }
+      return false;
+    }
+
+    // Login via popup controlado pelo Teams SDK (funciona no desktop)
+    async function loginViaPopup() {
+      setStatus('Abrindo login Microsoft...');
+      document.getElementById('loginBtn').style.display = 'none';
+      document.getElementById('spinner').style.display = 'block';
+
+      if (isInTeams) {
+        try {
+          // O Teams Desktop gerencia o popup nativamente
+          const result = await microsoftTeams.authentication.authenticate({
+            url: `${SUPABASE_URL}/auth/v1/authorize?provider=azure&redirect_to=${encodeURIComponent(AUTH_CALLBACK_URL)}`,
+            width: 600,
+            height: 535,
+            isExternal: false
+          });
+
+          // Popup retornou com sucesso — tokens vêm como string JSON
+          if (result) {
+            const tokens = JSON.parse(result);
+            const { data, error } = await supabase.auth.setSession({
+              access_token: tokens.access_token,
+              refresh_token: tokens.refresh_token
+            });
+
+            if (error) {
+              showError('Erro ao definir sessão: ' + error.message);
+              showLoginButton();
+              return;
+            }
+
+            setStatus('Login realizado! Redirecionando...');
+            window.location.href = GOLEVEL_URL;
+          }
+        } catch (err) {
+          console.error('Popup auth error:', err);
+          showError('Erro no login: ' + (err.message || err));
+          showLoginButton();
+        }
+      } else {
+        // Fora do Teams — usa redirect padrão do Supabase
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'azure',
+          options: {
+            redirectTo: GOLEVEL_URL
+          }
+        });
+        if (error) showError('Erro: ' + error.message);
+      }
+    }
+
+    // Tentar SSO silencioso via Teams SDK
+    async function tryTeamsSSO() {
+      try {
+        setStatus('Obtendo token do Teams...');
+        const token = await microsoftTeams.authentication.getAuthToken();
+
+        if (token) {
+          setStatus('Token obtido. Autenticando...');
+          // Tentar usar o token para autenticação
+          // Se o backend aceitar tokens do Teams, usar aqui
+          // Por enquanto, fallback para popup
+          showLoginButton();
+          setStatus('Clique para entrar com sua conta Microsoft');
+        }
+      } catch (err) {
+        console.log('SSO silencioso não disponível, usando popup:', err);
+        showLoginButton();
+        setStatus('Clique para entrar com sua conta Microsoft');
+      }
+    }
+
+    // Inicialização
+    async function init() {
+      // Verificar sessão existente
+      const hasSession = await checkExistingSession();
+      if (hasSession) return;
+
+      // Tentar inicializar Teams SDK
+      try {
+        await microsoftTeams.app.initialize();
+        const context = await microsoftTeams.app.getContext();
+
+        if (context) {
+          isInTeams = true;
+          setStatus('Conectado ao Teams. Verificando autenticação...');
+
+          // Tentar SSO silencioso primeiro
+          await tryTeamsSSO();
+        }
+      } catch (err) {
+        // Não está no Teams — mostrar botão de login normal
+        console.log('Não está no Teams:', err);
+        isInTeams = false;
+        showLoginButton();
+        setStatus('Clique para entrar com sua conta Microsoft');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
