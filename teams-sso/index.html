@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,12 @@
   <script src="https://res.cdn.office.net/teams-js/2.28.0/js/MicrosoftTeams.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', -apple-system, sans-serif;
       background: #1B2A4A;
@@ -17,35 +23,46 @@
       justify-content: center;
       min-height: 100vh;
     }
+
     .container {
       text-align: center;
       padding: 2rem;
     }
+
     .logo {
       width: 80px;
       height: 80px;
       margin-bottom: 1.5rem;
     }
+
     h1 {
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 0.5rem;
     }
+
     .status {
       font-size: 0.95rem;
-      color: rgba(255,255,255,0.7);
+      color: rgba(255, 255, 255, 0.7);
       margin-bottom: 2rem;
     }
+
     .spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid rgba(255,255,255,0.2);
+      border: 3px solid rgba(255, 255, 255, 0.2);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       margin: 0 auto 1.5rem;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .btn {
       display: none;
       padding: 12px 32px;
@@ -57,7 +74,11 @@
       cursor: pointer;
       transition: background 0.2s;
     }
-    .btn:hover { background: #106EBE; }
+
+    .btn:hover {
+      background: #106EBE;
+    }
+
     .error {
       display: none;
       color: #FF6B6B;
@@ -66,9 +87,11 @@
     }
   </style>
 </head>
+
 <body>
   <div class="container">
-    <img src="https://admin.golevel.com.br/teams/color.png" alt="GoLevel" class="logo" onerror="this.style.display='none'">
+    <img src="https://admin.golevel.com.br/teams/color.png" alt="GoLevel" class="logo"
+      onerror="this.style.display='none'">
     <h1>GoLevel</h1>
     <p class="status" id="status">Conectando ao Microsoft Teams...</p>
     <div class="spinner" id="spinner"></div>
@@ -124,8 +147,12 @@
       if (isInTeams) {
         try {
           // O Teams Desktop gerencia o popup nativamente
+          // A URL de início deve ser no mesmo domínio do app (validDomains)
+          const supbaseUrl = `${SUPABASE_URL}/auth/v1/authorize?provider=azure&redirect_to=${encodeURIComponent(AUTH_CALLBACK_URL)}`;
+          const authStartUrl = window.location.origin + '/teams/auth-start.html?redirect=' + encodeURIComponent(supbaseUrl);
+
           const result = await microsoftTeams.authentication.authenticate({
-            url: `${SUPABASE_URL}/auth/v1/authorize?provider=azure&redirect_to=${encodeURIComponent(AUTH_CALLBACK_URL)}`,
+            url: authStartUrl,
             width: 600,
             height: 535,
             isExternal: false
@@ -216,4 +243,5 @@
     init();
   </script>
 </body>
+
 </html>
